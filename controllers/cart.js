@@ -1,23 +1,44 @@
 const asyncHandler = require("express-async-handler");
-const Cart = require("../models/cart");
+const User = require("../models/user");
+const jwt = require("jsonwebtoken");
+
+function Str_Random(length) {
+  let result = "";
+  const characters = "abcdefghijklmnopqrstuvwxyz0123456789";
+
+  // Loop to generate characters for the specified length
+  for (let i = 0; i < length; i++) {
+    const randomInd = Math.floor(Math.random() * characters.length);
+    result += characters.charAt(randomInd);
+  }
+  return result;
+}
 
 const addToCart = asyncHandler(async (req, res) => {
   const { name, category, quantity, price, images } = req.body;
+
+  const user = req.user;
 
   if (!name || !category || !images || !quantity || !price) {
     res.status(400);
     throw new Error("Please fill in all fields");
   }
 
-  const product = await Cart.create({
+  const product = {
+    id: Str_Random(12),
     name,
     category,
     quantity,
     price,
     images,
-  });
+  };
 
-  res.status(201).json(product);
+  const userDoc = await User.findById(user._id);
+
+  userDoc.cart.push(product);
+  await userDoc.save();
+
+  res.status(201).json(userDoc);
 });
 
 const deleteCartItem = asyncHandler(async (req, res) => {
@@ -36,9 +57,19 @@ const deleteCartItem = asyncHandler(async (req, res) => {
 });
 
 const getCartProducts = asyncHandler(async (req, res) => {
-  const products = await Cart.find().sort("-createdAt");
+  const token = req.cookies.token;
 
-  res.status(200).json(products);
+  if (token) {
+    const verified = jwt.verify(token, process.env.JWT_SECRET);
+    if (!verified) {
+      res.send([]);
+      throw new Error("Token has expired, please login");
+    }
+
+    const userDoc = await User.findById(verified.id);
+    const { cart } = userDoc;
+    res.status(200).json(cart);
+  }
 });
 
 module.exports = { addToCart, deleteCartItem, getCartProducts };

@@ -39,6 +39,9 @@ const userSchema = new mongoose.Schema(
       type: Object,
       // address, state, country
     },
+    cart: {
+      type: [Object],
+    },
   },
   { timestamps: true }
 );
