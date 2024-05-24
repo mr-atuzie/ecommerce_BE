@@ -4,10 +4,9 @@ const {
   deleteCartItem,
   getCartProducts,
 } = require("../controllers/cart");
-const { protect } = require("../middleware/authMiddleware");
 const router = express.Router();
 
-router.patch("/", protect, addToCart);
+router.patch("/", addToCart);
 router.delete("/:id", deleteCartItem);
 router.get("/", getCartProducts);
 

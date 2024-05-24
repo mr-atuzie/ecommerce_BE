@@ -15,9 +15,8 @@ function Str_Random(length) {
 }
 
 const addToCart = asyncHandler(async (req, res) => {
+  const token = req.cookies.token;
   const { name, category, quantity, price, images } = req.body;
-
-  const user = req.user;
 
   if (!name || !category || !images || !quantity || !price) {
     res.status(400);
@@ -33,12 +32,20 @@ const addToCart = asyncHandler(async (req, res) => {
     images,
   };
 
-  const userDoc = await User.findById(user._id);
+  if (token) {
+    const verified = jwt.verify(token, process.env.JWT_SECRET);
+    if (!verified) {
+      res.send([]);
+      throw new Error("Token has expired, please login");
+    }
 
-  userDoc.cart.push(product);
-  await userDoc.save();
+    const userDoc = await User.findById(verified.id);
 
-  res.status(201).json(userDoc);
+    userDoc.cart.push(product);
+    await userDoc.save();
+
+    res.status(201).json(userDoc);
+  }
 });
 
 const deleteCartItem = asyncHandler(async (req, res) => {
