@@ -94,6 +94,10 @@ const orderProduct = asyncHandler(async (req, res) => {
 
   const user = req.user;
 
+  user.cart = [];
+
+  const updatedUser = await user.save();
+
   const orderDoc = await Order.create({
     user: user._id,
     products,
