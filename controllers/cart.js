@@ -1,67 +1,66 @@
 const asyncHandler = require("express-async-handler");
-const User = require("../models/user");
-const jwt = require("jsonwebtoken");
+const Order = require("../models/order");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
-function Str_Random(length) {
-  let result = "";
-  const characters = "abcdefghijklmnopqrstuvwxyz0123456789";
+// function Str_Random(length) {
+//   let result = "";
+//   const characters = "abcdefghijklmnopqrstuvwxyz0123456789";
 
-  // Loop to generate characters for the specified length
-  for (let i = 0; i < length; i++) {
-    const randomInd = Math.floor(Math.random() * characters.length);
-    result += characters.charAt(randomInd);
-  }
-  return result;
-}
+//   // Loop to generate characters for the specified length
+//   for (let i = 0; i < length; i++) {
+//     const randomInd = Math.floor(Math.random() * characters.length);
+//     result += characters.charAt(randomInd);
+//   }
+//   return result;
+// }
 
 const addToCart = asyncHandler(async (req, res) => {
-  const { id } = req.params;
-  const { name, category, quantity, price, images } = req.body;
-
-  if (!name || !category || !images || !quantity || !price) {
-    res.status(400);
-    throw new Error("Please fill in all fields");
-  }
+  const {
+    name,
+    price,
+    quantity,
+    size,
+    description,
+    category,
+    image,
+    productId,
+  } = req.body;
 
   const product = {
-    id: Str_Random(12),
+    productId,
     name,
-    category,
-    quantity,
     price,
-    images,
+    quantity,
+    size,
+    description,
+    category,
+    image,
   };
 
+  const user = req.user;
+
   user.cart.push(product);
-  await user.save();
+  // user.cart = [];
 
-  res.status(201).json(user);
+  const updatedUser = await user.save();
+
+  res.status(201).json({
+    cart: updatedUser.cart,
+  });
 });
 
-const deleteCartItem = asyncHandler(async (req, res) => {
-  const { id } = req.params;
+const removeFromCart = asyncHandler(async (req, res) => {
+  const { id } = req.body;
+
   const user = req.user;
-  const cart = user.cart;
 
-  // const product = await Cart.findById(id);
+  const newCart = user.cart.filter((item) => item.productId !== id);
+  user.cart = newCart;
+  // user.cart = [];
 
-  // if (!product) {
-  //   res.status(404);
-  //   throw new Error("Product not found");
-  // }
+  const updatedUser = await user.save();
 
-  // await Cart.findByIdAndDelete(id);
-
-  res.status(200).json({ cart, cartID: id });
-
-  // state.cart = state.cart.filter((product) => product._id !== action.payload);
-});
-
-const getCartProducts = asyncHandler(async (req, res) => {
-  const user = req.user;
-  const cart = user.cart;
-  res.status(200).json({ cart });
+  res.status(201).json(updatedUser.cart);
 });
 
 const checkout = asyncHandler(async (req, res) => {
@@ -84,10 +83,40 @@ const checkout = asyncHandler(async (req, res) => {
     line_items: lineItems,
     mode: "payment",
     success_url: `${process.env.FRONTEND_URL}/payment-success`,
-    cancel_url: `${process.env.FRONTEND_URL}/cancel-payment`,
+    cancel_url: `${process.env.FRONTEND_URL}/cart`,
   });
 
   res.json({ id: session.id });
 });
 
-module.exports = { addToCart, deleteCartItem, getCartProducts, checkout };
+const orderProduct = asyncHandler(async (req, res) => {
+  const { shipping, products } = req.body;
+
+  const user = req.user;
+
+  const orderDoc = await Order.create({
+    user: user._id,
+    products,
+    delivery: shipping,
+  });
+
+  res.status(201).json(orderDoc);
+});
+
+const getOrder = asyncHandler(async (req, res) => {
+  const user = req.user;
+
+  const orderDoc = await Order.find({
+    user: user._id,
+  });
+
+  res.status(201).json(orderDoc);
+});
+
+module.exports = {
+  checkout,
+  orderProduct,
+  getOrder,
+  addToCart,
+  removeFromCart,
+};
