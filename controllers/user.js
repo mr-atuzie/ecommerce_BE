@@ -41,8 +41,8 @@ const registerUser = asyncHandler(async (req, res) => {
       path: "/",
       httpOnly: true,
       expires: new Date(Date.now() + 1000 * 86400),
-      //   sameSite: "none",
-      //   secure: true,
+      sameSite: "none",
+      secure: true,
     });
 
     res.status(201).json({ _id, name, email, role, token });
@@ -82,8 +82,8 @@ const loginUser = asyncHandler(async (req, res) => {
       path: "/",
       httpOnly: true,
       expires: new Date(Date.now() + 1000 * 86400),
-      //   sameSite: "none",
-      //   secure: true,
+      sameSite: "none",
+      secure: true,
     });
 
     res.status(201).json(newUser);
