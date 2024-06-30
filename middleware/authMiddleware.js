@@ -7,6 +7,7 @@ const protect = asyncHandler(async (req, res, next) => {
   const token = req.cookies.token;
 
   res.send(token);
+  console.log(token);
 
   // if (!token) {
   //   res.status(401);
