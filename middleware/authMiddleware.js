@@ -9,28 +9,28 @@ const protect = asyncHandler(async (req, res, next) => {
   res.send(token);
   console.log(token);
 
-  // if (!token) {
-  //   res.status(401);
-  //   throw new Error("Not authorized, please login");
-  // }
+  if (!token) {
+    res.status(401);
+    throw new Error("Not authorized, please login");
+  }
 
-  // //Verify token
-  // const verified = jwt.verify(token, process.env.JWT_SECRET);
+  //Verify token
+  const verified = jwt.verify(token, process.env.JWT_SECRET);
 
-  // if (!verified) {
-  //   res.status(401);
-  //   throw new Error("Token has expired, please login");
-  // }
+  if (!verified) {
+    res.status(401);
+    throw new Error("Token has expired, please login");
+  }
 
-  // const user = await User.findById(verified.id).select("-password");
+  const user = await User.findById(verified.id).select("-password");
 
-  // if (!user) {
-  //   res.status(401);
-  //   throw new Error("User not found");
-  // }
+  if (!user) {
+    res.status(401);
+    throw new Error("User not found");
+  }
 
-  // req.user = user;
-  // next();
+  req.user = user;
+  next();
   // } catch (error) {
   //   res.status(401);
   //   throw new Error(error);
