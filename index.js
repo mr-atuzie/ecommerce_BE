@@ -3,12 +3,12 @@ const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const colors = require("colors");
-
 const connectDB = require("./config/db");
 
 const userRoute = require("./routes/user");
 const productRoute = require("./routes/product");
 const cartRoute = require("./routes/cart");
+const authRoute = require("./routes/auth");
 const { errorHandler, notFound } = require("./middleware/errorMiddleware");
 
 const app = express();
@@ -28,6 +28,7 @@ app.use(
 app.use("/api/v1/users", userRoute);
 app.use("/api/v1/products", productRoute);
 app.use("/api/v1/cart", cartRoute);
+app.use("/api/v1/auth", authRoute);
 
 app.get("/", (req, res) => {
   res.send("HELLO WORLD :{)");
