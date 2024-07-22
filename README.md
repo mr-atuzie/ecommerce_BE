@@ -69,9 +69,29 @@ $ npm run dev
 Backend Repository: [https://github.com/mr-atuzie/ecommerce_FE](https://github.com/mr-atuzie/ecommerce_FE)
 
 ## Usage
-- Register or log in to access the eCommerce features.
-- Browse products and add items to your shopping cart.
-- Proceed to checkout and complete your purchase using the integrated payment system.
+### API Endpoints:
+Here are some of the key API endpoints available,to test your API endpoints, you can use Postman. 
+
+**User Endpoints:**
+```bash
+# Register a new user
+POST /api/users/register
+
+#Log in a user and obtain a JWT token
+POST /api/users/login
+
+# Add product to user cat
+POST /api/users/addToCart
+
+# Remove product from user cart
+POST /api/users/remove
+
+# Destroy user HTTPS cookie
+POST /api/users/logout
+
+# Retrieve user profile data (authentication required).
+GET /api/users/profile
+```
 
 ## Demo
 [https://2fa-form.netlify.app](https://2fa-form.netlify.app)
