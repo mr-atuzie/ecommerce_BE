@@ -45,10 +45,10 @@ From your command line, first clone the repo:
 ### 
 ```bash
 # Clone this repository
-$ git clone https://github.com/mr-atuzie/ecommerce_FE
+$ git clone https://github.com/mr-atuzie/ecommerce_BE
 
 # Go into the repository
-$ cd ecommerce_FE
+$ cd ecommerce_BE
 
 # Install dependencies
 $ npm install
@@ -63,6 +63,7 @@ REACT_APP_BACKEND_URL=your_backend_base_url
 ### Start the development severs
 ```bash
 $ npm run start
+$ npm run dev
 ```
 ## Related Repositories 
 Backend Repository: [https://github.com/mr-atuzie/ecommerce_FE](https://github.com/mr-atuzie/ecommerce_FE)
